@@ -1,36 +1,40 @@
-<div class="jumbotron" id="head"> <center><h1>Submit Your Story</h1></center>
-<div class = "container">
-  <div class="col-md-6 col-md-offset-3">
-
-  <h2 class="sub">We already know how magnificent you are… But now we want you to share your magnificence with the world!</h2>
+<<div class = "container">
+  <div class="jumbotron">
+  <h2>We already know how magnificent you are… But now we want you to share your magnificence with the world!</h2>
   <h4>We know you have a story that will inspire and uplift, and we’d love you to share your story with us. How has The Secret, The Magic, The Power or any of The Secret titles changed your life? What fantastic things have you manifested? Have you attracted your dream partner? Your dream job? The perfect home? Each story you submit will be reviewed by a moderator and may be chosen to be published.
   </h4>
+  <h1>Submit Your Story Here </h1>
+<form name="form" ng-submit="addStory(story)" role="form" method="POST" ng-controller="myct">
+      <div class="form-group" ng-class="{ 'has-error': form.firstName.$dirty && form.firstName.$error.required }">
+          <label for="username">Title</label>
+          <input type="text" name="title"  class="form-control"  ng-model="story.title" ng-minlength="3" ng-maxlength="18" required="" />
+          <div ng-messages="form.title.$error" ng-show="form.title.$dirty" >
+          <div ng-message="minlength">Title too short</div>
+            <div ng-message="maxlength">Titletoo long</div>
+          <div ng-message="required">Title name is required</div>
+      </div>
+      </div>
+      <div class="form-group" ng-class="{ 'has-error': form.category.$dirty && form.category.$error.required }">
+          <label>Category</label>
+          <select ng-model="story.category" class="form-control"  placeholder="select category" >
+          <option value="sports">sports</option>
+          <option value="science">science</option>
+          <option value="love">love</option>
+          <option value="horror">horror</option>
+          </select>
+      </div>
+      <div class="form-group" ng-class="{ 'has-error': form.content.$dirty && form.content.$error.required }">
+          <label for="content">Content</label>
+          <input type="content" name="content" class="form-control" ng-model="story.content" ng-minlength="500" ng-maxlength="1000" required="" />
+                <div ng-messages="form.username.$error" ng-show="form.username.$dirty">
+           <div ng-message="email">Invalid Email</div>
+          <div ng-message="required">Email is required </div>
+      </div>
+      </div>
+      <div class="form-actions">
+          <button type="submit"  onclick="alert('Story Submited')" ng-disabled="form.$invalid || vm.dataLoading" class="btn btn-primary">Submit Story</button>
+          <a href="#!/home" class="btn btn-link">Cancel</a><br>
+          <hr>
+      </div>
+  </form>
 
-
-  <h1 class "heading">Submit Your Story Here </h1>
-    <form name="storyForm" ng-controller="myct" >
-    <div class="form-group">
-        <label>Title</label>
-        <input type="text" name="title"  class="form-control" ng-model="story.title">
-
-    </div>
-    <div class="form-group">
-        <label>Category</label>
-        <select ng-model="story.category" class="form-control" >
-        <option value="sports">sports</option>
-        <option value="science">science</option>
-        <option value="love">love</option>
-        <option value="horror">horror</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <label>Content</label>
-        <textarea name="content" class="form-control" ng-model="story.content"></textarea>
-    </div>
- <input type="submit" ng-click="addStory(story)" class="btn btn-primary" value="submit story"/>
- <input type="submit" ng-click="back()" class="btn btn-primary" value="cancle"/>
-    </form>
-
-</div>
-</div>
-</div>
