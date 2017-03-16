@@ -1,0 +1,43 @@
+
+<!DOCTYPE html>
+<html>
+
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+    <!-- CSS (load bootstrap) -->
+    <link rel="stylesheet" href="https://unpkg.com/angular-toastr/dist/angular-toastr.css" />
+    <link rel="stylesheet" type="text/css" href="/client/story.css">
+
+    <!-- <link rel="stylesheet" href="/client/lib/bootstrap.min.css"> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!-- <script src="/client/lib/jquery-3.1.1.min.js"></script> -->
+    <script src="/client/lib/angular.min.js"></script>
+    <script src="https://unpkg.com/angular-toastr/dist/angular-toastr.tpls.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+ <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!-- <script src="/client/lib/bootstrap.min.js"></script> -->
+  <script src="/client/angular-messages.js"></script>
+    <script src="/client/lib/dirPagination.js"></script>
+    <script src="/client/lib/angular-resource.min.js"></script>
+    <script src="/client/lib/angular-ui-router.min.js"></script>
+    <script src="/client/app.js"></script>
+</head>
+
+   <body ng-app="storyApp">
+     <div ui-view="header"></div>
+       <div class="container-fluid">
+        <div class ="row">
+          <div class="col-sm-2 sidnav" >
+            <div ui-view="sidebar"></div>
+
+          </div>
+              <div class="col-sm-10">
+                <div ui-view="content">
+                </div>
+             </div>
+       </div>
+     </div>
+<div ui-view="footer"></div>
+  </body>
+</html>

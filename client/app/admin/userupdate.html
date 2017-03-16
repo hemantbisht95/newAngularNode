@@ -1,0 +1,29 @@
+<h2>Update</h2>
+<div class="container" ng-app="storyApp" ng-controller="UserCtrl" ng-init="getuser()" >
+<div class="col-sm-8 col-sm-offset-2">
+    <form name="storyForm" >
+    <div class="form-group">
+        <label>Firstname</label>
+        <input type="text" name="title"  class="form-control" ng-model="user.firstname">
+
+    </div>
+    <div class="form-group">
+        <label>Lastname</label>
+        <input type="text" name="category" class="form-control" ng-model="user.lastname">
+
+    </div>
+    <div class="form-group">
+        <label>Email</label>
+        <input type="text" name="content" class="form-control" ng-model="user.email">
+        </textarea>
+    </div>
+    <div class="form-group">
+        <label>Password</label>
+        <input type="text" name="content" class="form-control" ng-model="user.password">
+        </textarea>
+    </div>
+ <input type="submit" ng-click="updateuser(user)" class="btn btn-primary" value="Update"/>
+  <input type="submit" ng-click="bac()" class="btn btn-primary" value="back"/>
+    </form>
+</div>
+</div>

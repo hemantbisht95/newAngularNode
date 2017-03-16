@@ -1,0 +1,43 @@
+
+
+
+<h1> <center>Admin panel</center></h1>
+<h2> Stories</h2>
+ <div ng-controller="myct" ng-init="getst()" >
+
+   <div class="table-responsive">
+ <table class="table table-striped table-bordered table-hover table-condensed" >
+   <thead>
+      <tr>
+      <div>
+      <button type="button" class="btn btn-primary" ng-click="newStory()">New</button>
+    </div>
+    <input type="text" ng-model="search" placeholder="Search">
+      </tr>
+      <tr>
+      <th>Title</th>
+      <th>category</th>
+      <th>content</th>
+      <th>opration</th>
+    </tr>
+  </thead>
+    <tbody>
+      <tr dir-paginate="story in stories|filter:search|itemsPerPage:3" >
+        <td>{{story.title}}</td>
+        <td>{{story.category}}</td>
+        <td>{{story.content}}</td>
+        <td><button class="btn btn-danger btn-small" ng-click="deleteStory(story._id,$index)">Delete</button>
+             <button type="button" class="btn btn-primary" ng-click="editStory(story._id)">Edit</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<dir-pagination-controls
+    max-size="5"
+    direction-links="true"
+    boundary-links="true" >
+  </dir-pagination-controls>
+</div>
+
+<a a href="#!/userview"><h4>User detail</h4></a>
