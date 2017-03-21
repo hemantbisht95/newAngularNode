@@ -5,18 +5,36 @@ p.outset {border-style: outset;
 h1{
   color:skyblue;
 }
-</style>
 
+div.scroll {
+    width: 100%;
+    height: 100px;
+    overflow: auto;
+}
+textarea{
+  resize: none;
+
+}
+</style>
+<div class="jumbotron" style="background-color:red:"><h1><center>Submit Your Story</center></h1></div>
 <h2> Stories</h2>
  <div ng-controller="myct" ng-init="getst()" >
     <input type="text" ng-model="search" placeholder="Search">
      <div dir-paginate="story in stories|filter:search|itemsPerPage:3"  >
-       <h1>submitedby:-{{story.submitedby.firstname}}</h1></br>
-       <h1>Title:-{{story.title}}</h1></br>
+       <h1>Title:-{{story.title}}{{story.id}}</h1></br>
        <h4>category:-{{story.category}}</h4></br>
-       <div class="jumbotron">{{story.content}}</div>
-       <h4>Comments:-{{story.comments}}</h4></br>
-       <p class="outset"></p>
+       <p>{{story.content}}</p>
+       <div>
+        <textarea ng-model="Comment"></textarea>
+        <button ng-click='comment(story._id,Comment)'> Comment</button>
+        </div>
+        <h3 style='color:skyblue;'> Comments:-</h3>
+        <div class="scroll">
+             <div  ng-repeat='Story in story.comment'>
+             <p>comment:- {{Story.Comment}}</p>
+             </div>
+</div>
+ <p class="outset"></p>
 <!-- <div id="well" class="well well-lg"></div> -->
 
         <!-- <td><button class="btn btn-danger btn-small" ng-click="deleteStory(story._id,$index)">Delete</button>
