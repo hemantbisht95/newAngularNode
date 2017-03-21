@@ -1,5 +1,5 @@
-<<div class = "container">
-  <div class="jumbotron">
+
+<div class = "container">
   <h2>We already know how magnificent you are… But now we want you to share your magnificence with the world!</h2>
   <h4>We know you have a story that will inspire and uplift, and we’d love you to share your story with us. How has The Secret, The Magic, The Power or any of The Secret titles changed your life? What fantastic things have you manifested? Have you attracted your dream partner? Your dream job? The perfect home? Each story you submit will be reviewed by a moderator and may be chosen to be published.
   </h4>
@@ -9,9 +9,9 @@
           <label for="username">Title</label>
           <input type="text" name="title"  class="form-control"  ng-model="story.title" ng-minlength="3" ng-maxlength="18" required="" />
           <div ng-messages="form.title.$error" ng-show="form.title.$dirty" >
-          <div ng-message="minlength">Title too short</div>
-            <div ng-message="maxlength">Titletoo long</div>
-          <div ng-message="required">Title name is required</div>
+          <div ng-message="minlength">Title is too short</div>
+            <div ng-message="maxlength">Title is too long</div>
+          <div ng-message="required">Title  is required</div>
       </div>
       </div>
       <div class="form-group" ng-class="{ 'has-error': form.category.$dirty && form.category.$error.required }">
@@ -25,10 +25,9 @@
       </div>
       <div class="form-group" ng-class="{ 'has-error': form.content.$dirty && form.content.$error.required }">
           <label for="content">Content</label>
-          <input type="content" name="content" class="form-control" ng-model="story.content" ng-minlength="500" ng-maxlength="1000" required="" />
-                <div ng-messages="form.username.$error" ng-show="form.username.$dirty">
-           <div ng-message="email">Invalid Email</div>
-          <div ng-message="required">Email is required </div>
+          <textarea name="content" class="form-control" ng-model="story.content" ng-minlength="500" ng-maxlength="1000" required="" /></textarea>
+                <div ng-messages="form.content.$error" ng-show="form.content.$dirty">
+          <div ng-message="required">this field is required </div>
       </div>
       </div>
       <div class="form-actions">
@@ -37,4 +36,4 @@
           <hr>
       </div>
   </form>
-
+</div>
