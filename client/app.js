@@ -1,4 +1,4 @@
-var storyApp  = angular.module('storyApp', ['ui.router' , 'ngResource','angularUtils.directives.dirPagination','toastr','ngMessages']);
+var storyApp  = angular.module('storyApp', ['ui.router' ,'ngFileUpload', 'ngResource','angularUtils.directives.dirPagination','toastr','ngMessages']);
 var baseurl ='http://172.10.1.7:4046';
 storyApp.factory('httpRequestInterceptor', function ($q,$rootScope,$location) {
 
@@ -46,20 +46,23 @@ storyApp.factory("storyService",function($resource,$stateParams){
       return $resource(baseurl+'/user/userprofile');
     },
     getStory:function(){
-      return $resource(baseurl+'/story/getStory');
+      return $resource(baseurl+'/user/getStory');
     },
     addStory:function(){
-      return $resource(baseurl+'/story/addStory');
+      return $resource(baseurl+'/user/addStory');
     },
     deleteStory:function(id){
-      return $resource(baseurl+'/story/removeStory/'+id);
+      return $resource(baseurl+'/user/removeStory/'+id);
 
     },
     getaStory:function(){
-      return $resource(baseurl+'/story/'+$stateParams.id);
+      return $resource(baseurl+'/user/'+$stateParams.id);
     },
     editStory:function(id,story){
-      return $resource(baseurl+'/story/updateStory/'+$stateParams.id,story);
+      return $resource(baseurl+'/user/updateStory/'+$stateParams.id,story);
+    },
+    comment:function(id,Comment){
+      return $resource(baseurl+ '/user/addComment/'+ id);
     }
     }
   });
@@ -328,6 +331,24 @@ $scope.stories=[];
       });
   }
 
+  $scope.comment=function(id,Comment){
+
+
+      console.log(id);
+        console.log(Comment);
+  storyService.comment(id).save({Comment,id},function(response){
+          console.log("inside comment blog");
+        if(response.code==200){
+      toastr.success('success', "comment successfully");
+          window.location = '/';
+      }
+        else{
+         toastr.warning('error', "comment faield");
+
+          }
+       })
+    }
+
 $scope.newStory=function(){
     $location.path('/submitAstory')
   }
@@ -404,7 +425,7 @@ $scope.edit=function(story){
                     $location.path('/home')
      }
 });
-storyApp.controller('UserCtrl', function($scope, $http,$location ,$stateParams,$resource,storyService,toastr)
+storyApp.controller('UserCtrl', function($scope,Upload, $http,$location ,$stateParams,$resource,storyService,toastr)
  {
 
    $scope.getall= function(user)
@@ -480,38 +501,7 @@ storyApp.controller('UserCtrl', function($scope, $http,$location ,$stateParams,$
         toastr.warning('You Cancelled!No Change');
   }
  }
-//  $scope.editUsr=function(id){
-//    console.log(id);
-//    $location.path('/userupdate/'+id)
-//  }
-//  $scope.getusr=function(){
-//    storyService.getaUser($stateParams.id).get(function(response){
-//      if(response.code==200){
-//      $scope.user=response.data[0];
-//    }else{
-//      console.log("error");
-//      toastr.error('error');
-//    }
-//  });
-// }
-//
-// $scope.updateuser=function(user){
-// storyService.editUser($stateParams.id).save(user,function(response){
-//   if(response.code==200)
-//     {
-//        console.log("updated")
-//        toastr.success('record updated successfully',"Information");
-//        }else{
-//             console.log("not updated")
-//             toastr.warning('record not updated', 'Warning');
-//        }
-//   },
-//   function(response){
-//     console.log("error")
-//     toastr.error('error', 'Error');
-//     })
-//     $location.path('/home')
-//  }
+
  $scope.editUsr=function(){
    console.log();
    $location.path('/userupdate')
@@ -559,4 +549,20 @@ storyService.editUser().save(user,function(response){
         }
     });
   }
+  $scope.upload = function (file) {
+      Upload.upload({
+          url: 'upload/url',
+          data: {file: file, 'username': $scope.username}
+      }).then(function (resp) {
+          console.log('Success ' + resp.config.data.file.name + 'uploaded. Response: ' + resp.data);
+      }, function (resp) {
+          console.log('Error status: ' + resp.status);
+      }, function (evt) {
+          var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
+          console.log('progress: ' + progressPercentage + '% ' + evt.config.data.file.name);
+      });
+  };
+
+
+
 });
