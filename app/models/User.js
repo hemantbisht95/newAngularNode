@@ -12,9 +12,11 @@ var Userschema = new Schema
     password:String,
     story:[{
       type:ObjectId,
-      ref:"story"}]
-
-
+      ref:"story"}],
+    isAdmin:{
+        type:Boolean,
+        default:false
+      }
 });
 
 var User = mongoose.model('User', Userschema);
