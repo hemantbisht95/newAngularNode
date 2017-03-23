@@ -1,22 +1,23 @@
 
-<nav class="navbar navbar-inverse" role="navigation" ng-controller="myController" >
+ <nav class="navbar navbar-inverse" role="navigation" ng-controller="myController" >
   <div class="container-fluid">
     <div class="navbar-header">
       <a class="navbar-brand"><img src="client/h.png" alt="post" style="width:40px; height:40px"></a>
     </div>
     <ul class="nav navbar-nav">
-        <li><a ui-sref="home">Home</a></li>
+        <li><a ui-sref="home" ng-if="!isAdminLogin">Home</a></li>
         <li><a ui-sref="submitAstory" ng-if="isuserlogin">Submit Your Story</a></li>
-        <li><a ui-sref="topStories">Top Stories</a></li>
-        <li><a ui-sref="contactUs" >Contact Us</a></li>
-        <li><a ui-sref="userprofile" ng-if="isuserlogin">My Profile</a></li>
+          <li><a ui-sref="admin" ng-if="isAdminLogin">viewstory</a></li>
+          <li><a ui-sref="userview" ng-if="isAdminLogin">viewuser</a></li>
+         <!-- <li><a ui-sref="topStories">Top Stories</a></li> -->
+        <li><a ui-sref="contactUs" ng-if="!isAdminLogin" >Contact Us</a></li>
+        <li><a ui-sref="userupdate" ng-if="isuserlogin">My Profile</a></li>
     </ul>
     <ul class="nav navbar-nav navbar-right">
-      <li><a ui-sref="login" ng-if="!isuserlogin"></i>Login</a></li>
-      <li><a ui-sref="home" ng-click="logout()" ng-if="isuserlogin"><i class="fa fa-sheild"></i>Logout</a></li>
-      <li><a ui-sref="register" ng-if="!isuserlogin"><span class="glyphicon glyphicon-user"></span>Register</a></li>
+      <li><a ui-sref="login" ng-if="!isuserlogin && !isAdminLogin"></i>Login</a></li>
+      <li><a ui-sref="home" ng-click="logout()" ng-if="isuserlogin||isAdminLogin"><i class="fa fa-sheild"></i>Logout</a></li>
+      <li><a ui-sref="register" ng-if="!isuserlogin && !isAdminLogin"><span class="glyphicon glyphicon-user"></span>Register</a></li>
   </ul>
-
 </nav>
-
 </div>
+
