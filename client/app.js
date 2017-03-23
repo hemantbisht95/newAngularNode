@@ -62,7 +62,7 @@ storyApp.factory("storyService",function($resource,$stateParams){
       return $resource(baseurl+'/user/updateStory/'+$stateParams.id,story);
     },
     comment:function(id,Comment){
-      return $resource(baseurl+ '/user/addComment/'+ id);
+      return $resource(baseurl+ '/user/addComment/'+ id,Comment);
     }
     }
   });
@@ -117,23 +117,23 @@ storyApp.factory("storyService",function($resource,$stateParams){
           auth : auth
       }
   })
-    .state('topStories', {
-         url: '/topStories',
-         views:{
-         "header": {
-                   templateUrl:"client/app/shared/header.html"
-         },
-         "sidebar":{
-                   templateUrl:"client/app/shared/sidebar.html"
-         },
-         "content":{
-                    templateUrl: "/client/app/topstory/topStories.html"
-         },
-         "footer":{
-                  templateUrl: "/client/app/shared/footer.html"
-         }
-      }
-   })
+  //   .state('topStories', {
+  //        url: '/topStories',
+  //        views:{
+  //        "header": {
+  //                  templateUrl:"client/app/shared/header.html"
+  //        },
+  //        "sidebar":{
+  //                  templateUrl:"client/app/shared/sidebar.html"
+  //        },
+  //        "content":{
+  //                   templateUrl: "/client/app/topstory/topStories.html"
+  //        },
+  //        "footer":{
+  //                 templateUrl: "/client/app/shared/footer.html"
+  //        }
+  //     }
+  //  })
    .state('contactUs', {
          url: '/contactUs',
          views:{
@@ -235,6 +235,9 @@ storyApp.factory("storyService",function($resource,$stateParams){
              "footer":{
                       templateUrl: "/client/app/shared/footer.html"
              }
+        },
+        resolve: {
+            auth : auth
         }
     })
     .state('userview', {
@@ -299,12 +302,24 @@ storyApp.factory("storyService",function($resource,$stateParams){
 
 
 
-storyApp.controller('myController', function($scope,$http,$location,$stateParams,$resource,storyService,toastr){
+storyApp.controller('myController', function($scope,$http,$rootScope,$location,$stateParams,$resource,storyService,toastr){
     var token = localStorage.getItem('webToken');
-       if(token!= null){
-         $scope.isuserlogin = true;
-         }else{
-              $scope.isuserlogin = false;
+    var role = localStorage.getItem('Role');
+       if(token!= null && role=='true'){
+         $scope.isAdminLogin = true;
+         $scope.isuserlogin =false;
+
+         console.log("Welcome Admin ");
+        $location.path('/admin')
+      }else if(token!= null && role=='false'){
+           $scope.isuserlogin = true;
+           $scope.isAdminLogin = false;
+           console.log("Welcome USer");
+           $location.path('/home')
+         }
+         else{
+           $scope.isuserlogin =false;
+           $scope.isAdminLogin=false
          }
               $scope.logout = function(){
               localStorage.removeItem('webToken');
@@ -324,7 +339,7 @@ $scope.stories=[];
             $scope.stories = response.data;
             }else{
                  alert('No record found');
-                 toastr.warning('no record found', 'Warning');
+                 toastr.warning('no record found', 'Warning');user
             }
                },function(response){
                  toastr.error('error', 'Error');
@@ -332,8 +347,6 @@ $scope.stories=[];
   }
 
   $scope.comment=function(id,Comment){
-
-
       console.log(id);
         console.log(Comment);
   storyService.comment(id).save({Comment,id},function(response){
@@ -414,18 +427,18 @@ $scope.edit=function(story){
              }else{
                    console.log("not updated")
                    toastr.warning('redord not updated', 'Warning');
-             }
-                 },function(response){
+                 }
+                },function(response){
                    console.log("error")
                    toastr.error('error', 'Error');
-           })
+                })
                    $location.path('/home')
-        }
+             }
                    $scope.back=function(){
                     $location.path('/home')
      }
 });
-storyApp.controller('UserCtrl', function($scope,Upload, $http,$location ,$stateParams,$resource,storyService,toastr)
+storyApp.controller('UserCtrl', function($scope,Upload, $http,$location,$rootScope ,$stateParams,$resource,storyService,toastr)
  {
 
    $scope.getall= function(user)
@@ -443,23 +456,23 @@ storyApp.controller('UserCtrl', function($scope,Upload, $http,$location ,$stateP
             toastr.error('error', 'Error');
       });
 }
-    $scope.register= function(user)
-{
+    $scope.register= function(user){
    console.log(user,'user');
      storyService.regUser().save(user,function(response){
        console.log(response);
           if(response.code==200){
             $scope.users = response.data;
-              toastr.success('Data Added successfully', 'information');
+              toastr.success('registration success', 'information');
+               $location.path('/login')
       }else{
-        alert('No record found');
-         toastr.warning('no record found', 'Warning');
+                $location.path('/register');
+         toastr.warning('user is already exists', 'Warning');
+
           }
         }, function(response) {
          toastr.error('got an error', 'Error');
-
       });
-         $location.path('/login')
+
   }
   $scope.login= function(user){
      storyService.loginUser().save(user,function(response){
@@ -467,16 +480,16 @@ storyApp.controller('UserCtrl', function($scope,Upload, $http,$location ,$stateP
       {
         /* step-2 save token */
         localStorage.setItem('webToken', response.data.token);
+        localStorage.setItem('Role', response.data.role);
         toastr.success(response.message);
         $location.path('/home')
       }
       else
       {
         toastr.info('Sorry try again');
-      }
+       }
     })
   }
-
 
   $scope.deleteuser = function(id,index){
     var sure=confirm("are you sure ?");
@@ -502,7 +515,7 @@ storyApp.controller('UserCtrl', function($scope,Upload, $http,$location ,$stateP
   }
  }
 
- $scope.editUsr=function(){
+ $scope.edi=function(){
    console.log();
    $location.path('/userupdate')
  }
@@ -566,3 +579,4 @@ storyService.editUser().save(user,function(response){
 
 
 });
+
