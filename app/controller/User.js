@@ -63,16 +63,49 @@ exports.removeUser = function(req, res){
     })
 }
 
-exports.regUser = function(req, res){
-    var User = new UserModel(req.body);
-    User.save(function (err){
-      if (err){
-            res.json({code:400,message:"error"});
-            }else{
-                   res.json({code:200,message:"created",data:User});
-              }
-        })
-  }
+// exports.regUser = function(req, res){
+//
+//
+//     var User = new UserModel(req.body);
+//     User.save(function (err){
+//       if (err){
+//             res.json({code:400,message:"error"});
+//             }else{
+//                    res.json({code:200,message:"created",data:User});
+//               }
+//         })
+//   }
+//
+
+
+
+  exports.regUser = function(req, res){
+    UserModel.findOne({email:req.body.email, password:req.body.password}).exec(function(err ,User)
+     {
+       if (err) {
+           res.json({
+               type: false,
+               message: "Error occured: " + err
+           });
+       } else {
+           if (User) {
+               res.json({
+                   type: false,
+                   message: "User already exists!"
+               });
+           } else {
+               var User = new UserModel(req.body);
+               User.save(function (err,user){
+                 if (err){
+                       res.json({code:400,message:"error"});
+                       }else{
+                              res.json({code:200,message:"User Added successfully",data:user});
+                         }
+                   })
+             }
+        }
+   });
+}
 
 exports.logUser = function(req, res){
     UserModel.findOne({email:req.body.email, password:req.body.password}).exec(function(err ,User)
@@ -91,12 +124,14 @@ exports.logUser = function(req, res){
              res.json({
              code:200,
              message: 'Succesfully Logged in',
-             data :{token: token }});
+             data :{token: token,
+               role:User.isAdmin
+              }});
              }else{
                   res.json({code:404,message:"email or passwod is wrong"});
             }
-         });
-       }
+       });
+    }
 
   exports.getuserProfile = function(req, res){
 
@@ -169,17 +204,14 @@ exports.logUser = function(req, res){
  }
    exports.getStoryById = function(req, res)
    {
-
    StoryModel.find({_id:req.params.id}).populate("comment").exec(function(err, story)
    {
       if(err){
          res.json({code: 400, message: "Error occurred"});
        }
      else{
-
      res.json({code: 200, message: "records found",data:story});
          }
-
      })
    }
      exports.updateStory = function(req, res)
@@ -236,3 +268,5 @@ exports.logUser = function(req, res){
            })
          })
        }
+
+
