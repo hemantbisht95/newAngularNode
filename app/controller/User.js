@@ -2,6 +2,8 @@ var UserModel = require("./../models/User");
 var jsonwebtoken = require('jsonwebtoken');
 var StoryModel = require("./../models/story");
 var CommentModel = require("./../models/comments");
+var path = require('path');
+var fs = require('fs');
 
 exports.getUser = function(req, res){
 UserModel.find({}).populate("story").exec(function(err, User){
@@ -14,9 +16,30 @@ UserModel.find({}).populate("story").exec(function(err, User){
 }
 
 exports.auth=function(req,res){
-res.json({code:450,message:"awd"});
-}
+  if(req.headers.authorization.split(" ").length==2){
+    var token=req.headers.authorization.split(" ")[1]
+    jsonwebtoken.verify(token, 'shhhhh', function(err, decoded) {
+      if (err) {
+         res.json({code:302,message:"internal error"});
+      } else {
+        UserModel.findOne({'_id':decoded.id}).exec(function(err, user)
+          {
+             if(user){
+              //  req.session["user"]=user;
+              //  console.log(req.session)
+               res.json({code:200,message:"Ok",user:user});
+               } else {
+                 res.json({code:302,message:"failed"});
+               }
+          });
 
+        }
+    });
+  }else {
+    res.json({code:302,message:"failed"});
+  }
+
+}
 exports.addUser = function(req, res){
   var User = new UserModel(req.body);
     User.save(function (err)
@@ -63,22 +86,6 @@ exports.removeUser = function(req, res){
     })
 }
 
-// exports.regUser = function(req, res){
-//
-//
-//     var User = new UserModel(req.body);
-//     User.save(function (err){
-//       if (err){
-//             res.json({code:400,message:"error"});
-//             }else{
-//                    res.json({code:200,message:"created",data:User});
-//               }
-//         })
-//   }
-//
-
-
-
   exports.regUser = function(req, res){
     UserModel.findOne({email:req.body.email, password:req.body.password}).exec(function(err ,User)
      {
@@ -114,6 +121,7 @@ exports.logUser = function(req, res){
        console.log(error)
        res.json({code:400,message:"error"});
        }else if(User){
+        //  req.session["user"]=User;
             /*step-1 create token*/
              var payload = {
              id : User._id
@@ -135,7 +143,7 @@ exports.logUser = function(req, res){
 
   exports.getuserProfile = function(req, res){
 
-    UserModel.findOne({'_id':req.user.id}).populate('story').exec(function(err, user)
+    UserModel.findOne({'_id':req.user.id}).populate("story").exec(function(err, user)
       {
          if(user){
             res.json({code: 200, message: "records found",data:user});
@@ -147,7 +155,7 @@ exports.logUser = function(req, res){
 
    exports.getUserComment = function(req, res){
 
-    CommentModel.findById({'_id':req.params.id}).exec(function(err, user)
+    CommentModel.find().exec(function(err, user)
        {
           if(user){
              res.json({code: 200, message: "records found",data:user});
@@ -156,8 +164,23 @@ exports.logUser = function(req, res){
             }
        });
     }
+
+
+  //  exports.loveStory = function(req, res){
+  //    StoryModel.find({category:{$eq:"love"}}).exec(function(err, user)
+  //          {
+  //             if(user){
+  //                res.json({code: 200, message: "records found",data:user});
+  //                 } else {
+  //                       res.json({code: 400, message: "Error occurred"});
+  //               }
+  //          });
+  //       }
+
+
     exports.postComment = function(req, res){
         var User = new   CommentModel(req.body);
+
         console.log(req.body);
         User.save(function (err){
           if (err){
@@ -170,22 +193,27 @@ exports.logUser = function(req, res){
 
    exports.getStory = function(req, res)
    {
-   StoryModel.find({}).sort('-created').populate("comment").exec(function(err, story)
+     console.log('iam here --->',req.query);
+     var obj=(req.query.isAdmin)?{}:{isApproved:true};
+     console.log(req.query.isAdmin,"---------->",obj);
+   StoryModel.find(obj).deepPopulate('comment comment.by name').exec(function(err, story)
    {
       if(err){
          res.json({code: 400, message: "Error occurred"});
        }
      else{
-
      res.json({code: 200, message: "records found",data:story});
          }
 
      })
    }
+
+
    exports.addStory = function(req, res) {
      var story = new StoryModel(req.body);
+     story.name=req.user.id;
      story.save(function(err) {
-        UserModel.update({'_id': req.user.id}, {$push: {story: story}}, function(err, Story){
+      UserModel.update({'_id': req.user.id}, {$push: {story: story}}, function(err, Story){
        if (err) {
          res.json({
            code: 400,
@@ -204,7 +232,7 @@ exports.logUser = function(req, res){
  }
    exports.getStoryById = function(req, res)
    {
-   StoryModel.find({_id:req.params.id}).populate("comment").exec(function(err, story)
+   StoryModel.findOne({_id:req.params.id}).deepPopulate('comment comment.by name').exec(function(err, story)
    {
       if(err){
          res.json({code: 400, message: "Error occurred"});
@@ -233,40 +261,81 @@ exports.logUser = function(req, res){
      }
 
 
-       exports.removeStory = function(req, res) {
-         console.log("removestory", req.params.id, req.body);
-         StoryModel.remove({
-           _id: req.params.id
-         }, function(err, story) {
-           if (err) {
-             res.json({
-               code: 400,
-               message: "error"
-             });
+   exports.removeStory = function(req, res) {
+     console.log("removestory", req.params.id, req.body);
+     StoryModel.remove({_id: req.params.id}, function(err, story) {
+       if (err) {
+         res.json({
+           code: 400,
+           message: "error"
+         });
 
-           } else {
-             res.json({
-               code: 200,
-               message: "removed",
-               data: story
-             });
+       } else {
+         res.json({
+           code: 200,
+           message: "removed",
+           data: story
+         });
 
+       }
+     })
+   }
+
+   exports.approvedStory= function(req, res) {
+     console.log(req.params,req.query)
+      StoryModel.update({_id: req.params.id}, {$set: {isApproved: req.query.isapproved}}, function(err, Story){
+       if (err) {
+         res.json({
+           code: 400,
+           message: "error"
+         });
+       } else {
+         res.json({
+           code: 200,
+           message: "created",
+           data: Story
+         });
+
+       }
+     })
+   }
+   
+   exports.addComment = function(req, res){
+     console.log(req.body);
+     var comment = new CommentModel(req.body);
+     comment.by=req.user.id;
+     comment.save(function(err){
+     console.log(err);
+    StoryModel.update({_id: req.params.id}, {$push: {comment: comment}}, function(err, Story){
+     if(err){ res.json({code: 404, message: err});
+     }else{
+             res.json({code: 200, data: Story });
            }
-         })
-       }
-
-       exports.addComment = function(req, res){
-         console.log(req.body);
-         var comment = new CommentModel(req.body);
-         comment.save(function(err){
-           console.log(err);
-         StoryModel.update({_id: req.params.id}, {$push: {comment: comment}}, function(err, Story){
-         if(err){ res.json({code: 404, message: err});
-         }else{
-                 res.json({code: 200, data: Story });
-               }
-           })
-         })
-       }
+       })
+     })
+   }
 
 
+  exports.uploadAvatar= function(req,res,next){
+      var file = 'client/images/' + req.file.filename;
+      fs.rename(req.file.path, file, function(err) {
+        console.log(file)
+        if (err) {
+          console.log(err);
+          res.sendStatus(500);
+        } else {
+          console.log(file,"file")
+          UserModel.update({'_id':req.user.id}, { $set: {userprofile:file} }, function(err, resp){
+            if (err) {
+              console.log(err);
+              res.sendStatus(500);
+            } else {
+              res.json({
+                message: 'File uploaded successfully',
+                filename: req.file.filename
+              });
+            }
+          })
+        }
+      });
+   }
