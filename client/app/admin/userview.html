@@ -11,8 +11,8 @@
      <th>Firstname</th>
      <th>Lastname</th>
      <th>Email</th>
-     <th>Password</th>
-     <th>opration</th>
+     <!-- <th>Password</th> -->
+     <!-- <th>opration</th> -->
    </tr>
  </thead>
    <tbody>
@@ -20,9 +20,10 @@
        <td>{{user.firstname}}</td>
        <td>{{user.lastname}}</td>
        <td>{{user.email}}</td>
-        <td>{{user.password}}</td>
+
+        <!-- <td>{{user.password}}</td> -->
        <td><button class="btn btn-danger btn-small" ng-click="deleteuser(user._id,$index)">Delete</button>
-            <button type="button" class="btn btn-primary" ng-click="editUsr(user)">Edit</button>
+            <!-- <button type="button" class="btn btn-primary" ng-click="editUsr(user)">Edit</button> -->
        </td>
      </tr>
    </tbody>
