@@ -1,21 +1,22 @@
 
+<
 <div class = "container">
-  <h2>We already know how magnificent you are… But now we want you to share your magnificence with the world!</h2>
+  <h2><em>We already know how magnificent you are… But now we want you to share your magnificence with the world!</em></h2>
   <h4>We know you have a story that will inspire and uplift, and we’d love you to share your story with us. How has The Secret, The Magic, The Power or any of The Secret titles changed your life? What fantastic things have you manifested? Have you attracted your dream partner? Your dream job? The perfect home? Each story you submit will be reviewed by a moderator and may be chosen to be published.
   </h4>
   <h1>Submit Your Story Here </h1>
 <form name="form" ng-submit="addStory(story)" role="form" method="POST" ng-controller="myct">
       <div class="form-group" ng-class="{ 'has-error': form.firstName.$dirty && form.firstName.$error.required }">
-          <label for="username">Title</label>
+          <label for="username" style="color:#666" >Title</label>
           <input type="text" name="title"  class="form-control"  ng-model="story.title" ng-minlength="3" ng-maxlength="18" required="" />
-          <div ng-messages="form.title.$error" ng-show="form.title.$dirty" >
-          <div ng-message="minlength">Title is too short</div>
-            <div ng-message="maxlength">Title is too long</div>
-          <div ng-message="required">Title  is required</div>
+          <div ng-messages="form.title.$error" ng-show="form.title.$dirty" style="color:red"  >
+          <div ng-message="minlength" >Title is too short</div>
+          <div ng-message="maxlength" >Title is too long</div>
+          <div ng-message="required" >Title  is required</div>
       </div>
       </div>
       <div class="form-group" ng-class="{ 'has-error': form.category.$dirty && form.category.$error.required }">
-          <label>Category</label>
+          <label for="category"  style="color:#666">Category</label>
           <select ng-model="story.category" class="form-control"  placeholder="select category" >
           <option value="sports">sports</option>
           <option value="science">science</option>
@@ -24,14 +25,16 @@
           </select>
       </div>
       <div class="form-group" ng-class="{ 'has-error': form.content.$dirty && form.content.$error.required }">
-          <label for="content">Content</label>
-          <textarea name="content" class="form-control" ng-model="story.content" ng-minlength="500" ng-maxlength="1000" required="" /></textarea>
-                <div ng-messages="form.content.$error" ng-show="form.content.$dirty">
-          <div ng-message="required">this field is required </div>
+          <label for="content" style="color:#666">Content</label>
+          <!-- <textarea name="content" class="form-control" ng-model="story.content" style="color:red"  ng-minlength="500" ng-maxlength="1000" required="" /></textarea> -->
+          <trix-editor name="content" ng-model-options="{ updateOn: 'blur' }" spellcheck="false" class="form-control"  ng-minlength="500" ng-maxlength="1000" ng-model="story.content" angular-trix trix-initialize="trixInitialize(e, editor);" trix-change="trixChange(e, editor);" trix-selection-change="trixSelectionChange(e, editor);" trix-focus="trixFocus(e, editor);" trix-blur="trixBlur(e, editor);" trix-file-accept="trixFileAccept(e, editor);" trix-attachment-add="trixAttachmentAdd(e, editor);" trix-attachment-remove="trixAttachmentRemove(e, editor);" placeholder="Write story here.." required=""></trix-editor>
+
+          <div ng-messages="form.content.$error" ng-show="form.content.$dirty">
+          <div ng-message="required" >this field is required </div>
       </div>
       </div>
       <div class="form-actions">
-          <button type="submit"  onclick="alert('Story Submited')" ng-disabled="form.$invalid || vm.dataLoading" class="btn btn-primary">Submit Story</button>
+          <button type="submit"  ng-disabled="form.$invalid || vm.dataLoading" class="btn btn-primary">Submit Story</button>
           <a href="#!/home" class="btn btn-link">Cancel</a><br>
           <hr>
       </div>
