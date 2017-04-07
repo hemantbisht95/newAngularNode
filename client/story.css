@@ -3,17 +3,31 @@ body, html {
     margin: 0;
     font-family: helvetica;
     font-weight: 100;
+    background-color:gray;
+
+}
+.main-header .navbar {
+  margin-left: 0;
 }
 .navbar {
-    border-radius: -15px;
+  margin-bottom: 0;
+     background-color:  #111;
+     z-index: 9999;
+     border: 0;
+     font-size: 12px !important;
+     line-height: 1.42857143 !important;
+
+     border-radius: 0;
+
 }
 .footer {
+
   position: sticky;
   bottom: 0;
   width: 100%;
-  /* Set the fixed height of the footer here */
+
   height: 60px;
-  /*background-color:  #111;*/
+  background-color:  #111;
        color: white;
        padding: 15px;
        margin-top: 15px;
@@ -38,8 +52,8 @@ li a {
 }
 
 li a:hover:not(.active) {
-    background-color: red;
-}
+    background-color: #00ffdc;
+}z
 
 .container {
     position: relative;
@@ -47,8 +61,11 @@ li a:hover:not(.active) {
     width: 100%;
 }
 
-.table{
-border-color: red;
-  border-style: solid;
-
+#jumb {
+    background-image: url(./header.png);
+    background-size: 100% 100%;
+    text-shadow: black 0.3em 0.3em 0.3em;
+    height: 350px;
+    margin-right: -1%;
+    margin-left: -2%;
 }

@@ -1,5 +1,7 @@
-var storyApp  = angular.module('storyApp', ['ui.router' ,'ngFileUpload', 'ngResource','angularUtils.directives.dirPagination','toastr','ngMessages']);
+var storyApp  = angular.module('storyApp', ['ui.router' ,'ngFileUpload','angular-rating', 'ngResource','angularUtils.directives.dirPagination','toastr','ngMessages','ngSanitize','angularTrix']);
 var baseurl ='http://172.10.1.7:4046';
+
+
 storyApp.factory('httpRequestInterceptor', function ($q,$rootScope,$location) {
 
   return {
@@ -15,6 +17,7 @@ storyApp.factory('httpRequestInterceptor', function ($q,$rootScope,$location) {
          if (response.data.code == 200) {
              $rootScope.isLoading = true;
              console.log(response);
+
          }else {
              $rootScope.isLoading = false;
          }
@@ -53,7 +56,6 @@ storyApp.factory("storyService",function($resource,$stateParams){
     },
     deleteStory:function(id){
       return $resource(baseurl+'/user/removeStory/'+id);
-
     },
     getaStory:function(){
       return $resource(baseurl+'/user/'+$stateParams.id);
@@ -63,18 +65,37 @@ storyApp.factory("storyService",function($resource,$stateParams){
     },
     comment:function(id,Comment){
       return $resource(baseurl+ '/user/addComment/'+ id,Comment);
+    },
+    approvedStory:function(id,isapproved){
+      return $resource(baseurl+'/user/approvedStory/'+id+"?isapproved="+isapproved);
     }
     }
   });
 
   storyApp.config(function($stateProvider,$urlRouterProvider,$httpProvider) {
         $httpProvider.interceptors.push('httpRequestInterceptor');
-        var auth = function($q, $timeout, $http, $location, $rootScope) {
+        var auth = function(isadmin){
+          return["$q", "$timeout", "$http", "$location", "$rootScope",function($q, $timeout, $http, $location, $rootScope){
           var deferred = $q.defer();
           $http.get('http://172.10.1.7:4046/user/auth').then(function(response) {
-              deferred.resolve();
+            console.log(response);
+            if(response.data.user){
+              var user=response.data.user;
+              if(user.isAdmin==isadmin){
+                    deferred.resolve();
+              }else{
+                if (user.isAdmin == 'true') {
+                  $location.path('/admin')
+                } else {
+                  $location.path('/home');
+               }
+             }
+            }else{
+              $location.path('/login');
+            }
           });
           return deferred.promise;
+        }];
       };
 
 
@@ -90,10 +111,10 @@ storyApp.factory("storyService",function($resource,$stateParams){
                 templateUrl:"client/app/shared/sidebar.html"
         },
         "content":{
-                templateUrl: "/client/app/home/home.html"
+                templateUrl:"/client/app/home/home.html"
         },
         "footer":{
-                templateUrl: "/client/app/shared/footer.html"
+                templateUrl:"/client/app/shared/footer.html"
         }
         }
     })
@@ -107,14 +128,14 @@ storyApp.factory("storyService",function($resource,$stateParams){
                    templateUrl:"client/app/shared/sidebar.html"
          },
          "content":{
-                   templateUrl: "/client/app/submitstory/story.html"
+                   templateUrl:"/client/app/submitstory/story.html"
          },
          "footer":{
-                   templateUrl: "/client/app/shared/footer.html"
+                   templateUrl:"/client/app/shared/footer.html"
          }
       },
       resolve: {
-          auth : auth
+          auth : auth(false)
       }
   })
   //   .state('topStories', {
@@ -144,10 +165,10 @@ storyApp.factory("storyService",function($resource,$stateParams){
                    templateUrl:"client/app/shared/sidebar.html"
          },
          "content":{
-                  templateUrl: "/client/app/contact/contactUs.html"
+                  templateUrl:"/client/app/contact/contactUs.html"
          },
          "footer":{
-                  templateUrl: "/client/app/shared/footer.html"
+                  templateUrl:"/client/app/shared/footer.html"
          }
       }
    })
@@ -161,10 +182,10 @@ storyApp.factory("storyService",function($resource,$stateParams){
                    templateUrl:"client/app/shared/sidebar.html"
          },
          "content":{
-                  templateUrl: "/client/app/about/about.html"
+                  templateUrl:"/client/app/about/about.html"
          },
          "footer":{
-                  templateUrl: "/client/app/shared/footer.html"
+                  templateUrl:"/client/app/shared/footer.html"
           }
         }
 
@@ -179,10 +200,10 @@ storyApp.factory("storyService",function($resource,$stateParams){
                      templateUrl:"client/app/shared/sidebar.html"
            },
            "content":{
-                     templateUrl: "/client/app/login/login.html"
+                     templateUrl:"/client/app/login/login.html"
            },
            "footer":{
-                    templateUrl: "/client/app/shared/footer.html"
+                    templateUrl:"/client/app/shared/footer.html"
             }
           }
        })
@@ -196,10 +217,10 @@ storyApp.factory("storyService",function($resource,$stateParams){
                      templateUrl:"client/app/shared/sidebar.html"
            },
            "content":{
-                     templateUrl: "/client/app/register/register.html"
+                     templateUrl:"/client/app/register/register.html"
            },
            "footer":{
-                    templateUrl: "/client/app/shared/footer.html"
+                    templateUrl:"/client/app/shared/footer.html"
           }
         }
      })
@@ -213,11 +234,13 @@ storyApp.factory("storyService",function($resource,$stateParams){
                        templateUrl:"client/app/shared/sidebar.html"
              },
              "content": {
-                      templateUrl: "/client/app/register/edit.html",
+                      templateUrl:"/client/app/register/edit.html",
              },
              "footer":{
-                      templateUrl: "/client/app/shared/footer.html"
+                      templateUrl:"/client/app/shared/footer.html"
             }
+            },resolve: {
+              auth : auth(false)
         }
     })
     .state('userupdate', {
@@ -230,14 +253,14 @@ storyApp.factory("storyService",function($resource,$stateParams){
                        templateUrl:"client/app/shared/sidebar.html"
              },
              "content": {
-                      templateUrl: "/client/app/admin/userupdate.html",
+                      templateUrl:"/client/app/admin/userupdate.html",
              },
              "footer":{
-                      templateUrl: "/client/app/shared/footer.html"
+                      templateUrl:"/client/app/shared/footer.html"
              }
         },
         resolve: {
-            auth : auth
+            auth : auth(false)
         }
     })
     .state('userview', {
@@ -250,10 +273,10 @@ storyApp.factory("storyService",function($resource,$stateParams){
                        templateUrl:"client/app/shared/sidebar.html"
              },
              "content": {
-                      templateUrl: "/client/app/admin/userview.html",
+                      templateUrl:"/client/app/admin/userview.html",
              },
              "footer":{
-                      templateUrl: "/client/app/shared/footer.html"
+                      templateUrl:"/client/app/shared/footer.html"
              }
         }
     })
@@ -267,14 +290,14 @@ storyApp.factory("storyService",function($resource,$stateParams){
                        templateUrl:"client/app/shared/sidebar.html"
              },
             "content": {
-                      templateUrl: "/client/app/admin/admin.html",
+                      templateUrl:"/client/app/admin/admin.html",
              },
              "footer":{
-                      templateUrl: "/client/app/shared/footer.html"
+                      templateUrl:"/client/app/shared/footer.html"
              }
              },
              resolve: {
-                 auth : auth
+                 auth : auth(true)
              }
          })
      .state('userprofile', {
@@ -287,59 +310,60 @@ storyApp.factory("storyService",function($resource,$stateParams){
                         templateUrl:"client/app/shared/sidebar.html"
               },
               "content": {
-                          templateUrl: "/client/app/user/userprofile.html",
+                          templateUrl:"/client/app/user/userprofile.html",
               },
               "footer":{
-                       templateUrl: "/client/app/shared/footer.html"
+                       templateUrl:"/client/app/shared/footer.html"
                   }
               },
               resolve: {
-                  auth : auth
+                  auth : auth(false)
               }
         })
     });
 
 
+storyApp.controller('myController', function($scope, $http, $location, $stateParams, $resource, storyService, toastr) {
+  var token = localStorage.getItem('webToken');
+  var role = localStorage.getItem('Role');
+  if (token != null && role == 'true') {
+    $scope.isAdminLogin = true;
+    $scope.isuserlogin = false;
 
 
-storyApp.controller('myController', function($scope,$http,$rootScope,$location,$stateParams,$resource,storyService,toastr){
-    var token = localStorage.getItem('webToken');
-    var role = localStorage.getItem('Role');
-       if(token!= null && role=='true'){
-         $scope.isAdminLogin = true;
-         $scope.isuserlogin =false;
+  } else if (token != null && role == 'false') {
+    $scope.isuserlogin = true;
+    $scope.isAdminLogin = false;
+     console.log(token," != null && ",role," == 'false'");
 
-         console.log("Welcome Admin ");
-        $location.path('/admin')
-      }else if(token!= null && role=='false'){
-           $scope.isuserlogin = true;
-           $scope.isAdminLogin = false;
-           console.log("Welcome USer");
-           $location.path('/home')
-         }
-         else{
-           $scope.isuserlogin =false;
-           $scope.isAdminLogin=false
-         }
-              $scope.logout = function(){
-              localStorage.removeItem('webToken');
-              toastr.success("You are logout");
-              window.location = '/';
-       };
+  } else {
+    $scope.isuserlogin = false;
+    $scope.isAdminLogin = false;
+
+  }
+  $scope.logout = function() {
+    localStorage.removeItem('webToken');
+    localStorage.removeItem('Role');
+    toastr.success("logged out successfully");
+    window.location = '/home';
+  };
 });
 
 
-storyApp.controller('myct', function($scope, $http,$location ,$stateParams,$resource,storyService,toastr){
+storyApp.controller('myct', function($scope,$window, $http,$location ,$stateParams,$resource,storyService,toastr){
 $scope.stories=[];
   $scope.getst = function()
     {
-       storyService.getStory().get(function(response){
+
+ var role = localStorage.getItem('Role');
+   var obj=(role=='true')?{isAdmin:true}:{};
+       storyService.getStory().get(obj,function(response){
          console.log(response);
          if(response.code==200){
             $scope.stories = response.data;
             }else{
                  alert('No record found');
-                 toastr.warning('no record found', 'Warning');user
+                 toastr.warning('no record found', 'Warning')
             }
                },function(response){
                  toastr.error('error', 'Error');
@@ -349,18 +373,35 @@ $scope.stories=[];
   $scope.comment=function(id,Comment){
       console.log(id);
         console.log(Comment);
-  storyService.comment(id).save({Comment,id},function(response){
-          console.log("inside comment blog");
+  storyService.comment(id).save({Comment},function(response){
         if(response.code==200){
       toastr.success('success', "comment successfully");
-          window.location = '/';
+        $scope.getst();
       }
         else{
-         toastr.warning('error', "comment faield");
-
+         toastr.warning('error', "comment failed");
           }
        })
     }
+
+
+    var events = ['trixInitialize', 'trixChange', 'trixSelectionChange', 'trixFocus', 'trixBlur', 'trixFileAccept', 'trixAttachmentAdd', 'trixAttachmentRemove'];
+
+        for (var i = 0; i < events.length; i++) {
+            $scope[events[i]] = function(e) {
+                console.info('Event type:', e.type);
+            }
+        };
+
+        var createStorageKey, host;
+        createStorageKey = function(file) {
+            var date, day, time;
+            date = new Date();
+            day = date.toISOString().slice(0, 10);
+            time = date.getTime();
+            return "tmp/" + day + "/" + time + "-" + file.name;
+
+        };
 
 $scope.newStory=function(){
     $location.path('/submitAstory')
@@ -372,6 +413,7 @@ $scope.newStory=function(){
          if(response.code==200){
             $scope.stories = response.data;
             toastr.success('Data Added successfully', 'information');
+             $scope.getst()
             }else{
                  alert('No record found');
                  toastr.warning('no record found', 'Warning');
@@ -379,7 +421,7 @@ $scope.newStory=function(){
                  }, function(response) {
                     toastr.error('got an error', 'Error');
             });
-                    $location.path('/home')
+                      window.location = '/';
 }
 
 $scope.deleteStory = function(id,index){
@@ -394,15 +436,36 @@ $scope.deleteStory = function(id,index){
             }else{
                  console.log("not deleted");
                  toastr.warning('rdata not deleted', 'Warning');
-           }
-               },function(response)
-           {
+                 }
+               },function(response){
                  toastr.error('got an error', 'Error');
-       });
+            });
                  }else{
                      toastr.warning('You Cancelled!No Change');
-      }
+       }
   }
+  $scope.approvedStory = function(id,isapproved){
+      var sure=confirm("are you sure ?");
+         if(sure){
+           isapproved=(isapproved==1)?true:false;
+           storyService.approvedStory(id,isapproved).get(function(response){
+            console.log(response);
+            if(response.code==200){
+              // console.log("story deleted");
+              // $scope.stories.splice(index, 1);
+              // toastr.success('Data deleted successfully', 'information');
+              }else{
+            //  console.log("not deleted");
+            //  toastr.warning('rdata not deleted', 'Warning');
+             }
+          },function(response){
+             toastr.error('got an error', 'Error');
+          });
+           }else{
+               toastr.warning('You Cancelled!No Change');
+         }
+    }
+
 $scope.editStory=function(id){
   console.log(id);
   $location.path('/edit/'+id)
@@ -410,7 +473,6 @@ $scope.editStory=function(id){
   $scope.getstr=function(){
       storyService.getaStory($stateParams.id).get(function(response){
           if(response.code==200){
-             $scope.story=response.data[0];
              }else{
                   console.log("error");
                   toastr.error('error', 'Error');
@@ -426,19 +488,19 @@ $scope.edit=function(story){
              toastr.success('record updated successfully',"Information");
              }else{
                    console.log("not updated")
-                   toastr.warning('redord not updated', 'Warning');
+                   toastr.warning('record not updated', 'Warning');
                  }
                 },function(response){
-                   console.log("error")
-                   toastr.error('error', 'Error');
+                     console.log("error")
+                     toastr.error('error', 'Error');
                 })
-                   $location.path('/home')
+                  $location.path('/home')
              }
-                   $scope.back=function(){
-                    $location.path('/home')
+                 $scope.back=function(){
+                     $location.path('/home')
      }
 });
-storyApp.controller('UserCtrl', function($scope,Upload, $http,$location,$rootScope ,$stateParams,$resource,storyService,toastr)
+storyApp.controller('UserCtrl', function($scope,Upload,$http,$location,$rootScope ,$stateParams,$resource,storyService,toastr)
  {
 
    $scope.getall= function(user)
@@ -451,9 +513,9 @@ storyApp.controller('UserCtrl', function($scope,Upload, $http,$location,$rootSco
              alert('No record found');
               toastr.warning('no record found', 'Warning');
            }
-         }, function(response)
+         }, function(error)
             {
-            toastr.error('error', 'Error');
+            toastr.error(error, 'Error');
       });
 }
     $scope.register= function(user){
@@ -464,7 +526,7 @@ storyApp.controller('UserCtrl', function($scope,Upload, $http,$location,$rootSco
             $scope.users = response.data;
               toastr.success('registration success', 'information');
                $location.path('/login')
-      }else{
+         }else{
                 $location.path('/register');
          toastr.warning('user is already exists', 'Warning');
 
@@ -486,7 +548,7 @@ storyApp.controller('UserCtrl', function($scope,Upload, $http,$location,$rootSco
       }
       else
       {
-        toastr.info('Sorry try again');
+        toastr.error('email or password is wrong');
        }
     })
   }
@@ -515,22 +577,23 @@ storyApp.controller('UserCtrl', function($scope,Upload, $http,$location,$rootSco
   }
  }
 
- $scope.edi=function(){
+ $scope.editUsr=function(){
    console.log();
    $location.path('/userupdate')
  }
+
  $scope.getuser=function(){
-   storyService.getaUser().get(function(response){
-     console.log(response.code);
-     if(response.code==200){
-       console.log(response.code);
-     $scope.user=response.data;
-   }else{
-     console.log("error");
-     toastr.error('error');
-   }
- });
-}
+       storyService.getaUser().get(function(response){
+         console.log('now',response.data);
+         if(response.code==200){
+           console.log(response.code);
+         $scope.user=response.data;
+       }else{
+         console.log("error");
+         toastr.error('error');
+       }
+    });
+  }
 
 $scope.updateuser=function(user){
 storyService.editUser().save(user,function(response){
@@ -548,35 +611,36 @@ storyService.editUser().save(user,function(response){
     toastr.error('error', 'Error');
     })
     $location.path('/userprofile')
- }
+  }
     $scope.bac=function(){
     $location.path('/home')
   }
   $scope.getpro=function(){
   storyService.getUserprofile().get(function(response){
-   console.log(response);
+   console.log('userProfile',response);
+
      if(response.code==200){
         $scope.user=response.data;
+         $scope.Story=response.data.story;
+        console.log("---->",$scope.Story);
       }else{
            console.log("no record found");
         }
     });
   }
   $scope.upload = function (file) {
+    console.log(file);
       Upload.upload({
-          url: 'upload/url',
-          data: {file: file, 'username': $scope.username}
+          url: 'http://172.10.1.7:4046/user/uploadAvatar',
+          data: {file: file}
       }).then(function (resp) {
-          console.log('Success ' + resp.config.data.file.name + 'uploaded. Response: ' + resp.data);
+          console.log('File uploaded successfully' + resp.config.data.file.name + 'uploaded. Response: ' + resp.data.filename);
+           $scope.getpro()
       }, function (resp) {
-          console.log('Error status: ' + resp.status);
+          // console.log('Error status: ' + resp.status);
       }, function (evt) {
           var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
-          console.log('progress: ' + progressPercentage + '% ' + evt.config.data.file.name);
+          console.log('progress:' + progressPercentage + '% ' + evt.config.data.file.name);
       });
-  };
-
-
-
+    };
 });
-
